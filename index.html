@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>個人作品集 | 高雄科技大學電子系碩士生</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0A0F1E;
+      --bg-card:  #111827;
+      --bg-glass: rgba(17, 24, 39, 0.7);
+      --purple:   #7C3AED;
+      --purple-lt:#A78BFA;
+      --purple-dim:rgba(124,58,237,0.15);
+      --text:     #E2E8F0;
+      --text-dim: #94A3B8;
+      --border:   rgba(124,58,237,0.2);
+      --font-h:   'Space Grotesk', sans-serif;
+      --font-b:   'Inter', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-b);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    a { color: var(--purple-lt); text-decoration: none; transition: color .2s; }
+    a:hover { color: #fff; }
+    img { max-width: 100%; display: block; }
+
+    .container { width: min(1100px, 90vw); margin: 0 auto; }
+    section { padding: 96px 0; }
+
+    .section-eyebrow {
+      font-family: var(--font-h);
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--purple-lt);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: var(--font-h);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 48px;
+      line-height: 1.2;
+    }
+
+    /* Navbar */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 18px 0;
+      background: rgba(10,15,30,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--font-h);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .02em;
+    }
+    .nav-logo span { color: var(--purple-lt); }
+
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { font-size: .875rem; font-weight: 500; color: var(--text-dim); transition: color .2s; }
+    .nav-links a:hover { color: #fff; }
+
+    .nav-cta {
+      font-size: .875rem;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 8px;
+      background: var(--purple);
+      color: #fff !important;
+      transition: background .2s, transform .15s;
+    }
+    .nav-cta:hover { background: #6D28D9; transform: translateY(-1px); }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 2px; transition: all .3s;
+    }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { padding: 12px 24px; font-size: .9rem; color: var(--text-dim); font-weight: 500; }
+    .mobile-menu a:hover { color: #fff; background: var(--purple-dim); }
+
+    /* Hero */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: 120px 0 80px;
+    }
+
+    .hero-bg { position: absolute; inset: 0; z-index: 0; background: var(--bg); }
+    .hero-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 50%, rgba(124,58,237,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(79,70,229,0.12) 0%, transparent 60%);
+    }
+
+    .beam {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--purple-lt), transparent);
+      opacity: 0;
+      animation: beam-travel 4s ease-in-out infinite;
+    }
+    .beam:nth-child(1) { top: 28%; width: 60%; left: 30%; animation-delay: 0s; }
+    .beam:nth-child(2) { top: 42%; width: 45%; left: 40%; animation-delay: 1.2s; }
+    .beam:nth-child(3) { top: 56%; width: 55%; left: 25%; animation-delay: 2.4s; }
+    .beam:nth-child(4) { top: 70%; width: 35%; left: 50%; animation-delay: 0.8s; }
+
+    @keyframes beam-travel {
+      0%   { opacity: 0; transform: scaleX(0) translateX(-10%); }
+      20%  { opacity: .6; }
+      50%  { opacity: .3; transform: scaleX(1) translateX(0); }
+      80%  { opacity: .6; }
+      100% { opacity: 0; transform: scaleX(0) translateX(10%); }
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--purple-dim);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--purple-lt);
+      margin-bottom: 20px;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--purple-lt);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:.4; transform:scale(.7); }
+    }
+
+    .hero-name {
+      font-family: var(--font-h);
+      font-size: clamp(2.6rem, 7vw, 4.8rem);
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .hero-role {
+      font-family: var(--font-h);
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 400;
+      color: var(--purple-lt);
+      margin-bottom: 24px;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text-dim);
+      max-width: 520px;
+      margin-bottom: 40px;
+      line-height: 1.8;
+    }
+
+    .hero-btns { display: flex; flex-wrap: wrap; gap: 14px; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--purple);
+      color: #fff; font-weight: 600; font-size: .9rem;
+      padding: 12px 28px; border-radius: 10px;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 24px rgba(124,58,237,0.3);
+    }
+    .btn-primary:hover { background: #6D28D9; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(124,58,237,.45); color:#fff; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--text);
+      font-weight: 500; font-size: .9rem;
+      padding: 12px 28px; border-radius: 10px;
+      border: 1px solid var(--border);
+      transition: border-color .2s, background .2s, transform .15s;
+    }
+    .btn-ghost:hover { border-color: var(--purple-lt); background: var(--purple-dim); transform: translateY(-2px); color:#fff; }
+
+    .hero-avatar-wrap { display: flex; justify-content: center; align-items: center; }
+
+    .avatar-card { position: relative; width: 280px; }
+    .avatar-card::before {
+      content: ''; position: absolute; inset: -2px; border-radius: 28px;
+      background: linear-gradient(135deg, var(--purple), #4F46E5, transparent 70%); z-index: 0;
+    }
+
+    .avatar-img-wrap {
+      position: relative; z-index: 1;
+      border-radius: 26px; overflow: hidden;
+      background: var(--bg-card); aspect-ratio: 1/1;
+    }
+    .avatar-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    .avatar-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: linear-gradient(145deg, #1a2035, #0f172a);
+      color: var(--text-dim); font-size: .8rem; gap: 12px;
+    }
+    .avatar-placeholder svg { width: 64px; height: 64px; color: var(--purple-lt); opacity: .6; }
+
+    .avatar-badge {
+      position: absolute; bottom: -14px; right: -14px; z-index: 2;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 8px 14px;
+      font-size: .78rem; font-weight: 600; color: var(--purple-lt);
+      backdrop-filter: blur(8px); white-space: nowrap;
+    }
+
+    /* About */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+    .about-text p { color: var(--text-dim); margin-bottom: 16px; line-height: 1.85; }
+
+    .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+    }
+    .stat-card .num { font-family: var(--font-h); font-size: 2rem; font-weight: 700; color: var(--purple-lt); line-height: 1; margin-bottom: 4px; }
+    .stat-card .label { font-size: .82rem; color: var(--text-dim); }
+
+    .timeline { display: flex; flex-direction: column; }
+
+    .tl-item { position: relative; padding: 0 0 32px 28px; }
+    .tl-item::before {
+      content: ''; position: absolute; left: 7px; top: 6px; bottom: 0;
+      width: 1px; background: var(--border);
+    }
+    .tl-item:last-child::before { display: none; }
+    .tl-item::after {
+      content: ''; position: absolute; left: 3px; top: 6px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--purple); border: 2px solid var(--bg); box-shadow: 0 0 8px var(--purple);
+    }
+
+    .tl-period { font-size: .78rem; font-weight: 600; color: var(--purple-lt); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+    .tl-title { font-family: var(--font-h); font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 6px; }
+    .tl-desc { font-size: .875rem; color: var(--text-dim); line-height: 1.7; }
+
+    /* Skills */
+    #skills { background: linear-gradient(180deg, var(--bg) 0%, #0d1428 100%); }
+
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+
+    .skill-category {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px;
+      transition: border-color .2s, transform .2s;
+    }
+    .skill-category:hover { border-color: rgba(124,58,237,.5); transform: translateY(-3px); }
+
+    .skill-cat-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--purple-dim); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 16px;
+    }
+    .skill-cat-name { font-family: var(--font-h); font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 14px; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .skill-tag {
+      font-size: .78rem; font-weight: 500; padding: 4px 12px;
+      border-radius: 100px; background: rgba(124,58,237,.12);
+      border: 1px solid rgba(124,58,237,.25); color: #C4B5FD; white-space: nowrap;
+    }
+
+    /* Portfolio */
+    .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+
+    .project-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden;
+      transition: border-color .2s, transform .25s, box-shadow .25s;
+    }
+    .project-card:hover { border-color: rgba(124,58,237,.5); transform: translateY(-6px); box-shadow: 0 16px 48px rgba(0,0,0,.4); }
+
+    .project-banner {
+      width: 100%; aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #1a103a, #0f1a2e);
+      overflow: hidden;
+    }
+    .project-banner img { width: 100%; height: 100%; object-fit: cover; }
+    .project-banner-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+
+    .project-body { padding: 24px; }
+
+    .project-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .project-tag {
+      font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+      padding: 3px 10px; border-radius: 6px;
+      background: var(--purple-dim); color: var(--purple-lt); border: 1px solid var(--border);
+    }
+
+    .project-title { font-family: var(--font-h); font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .project-desc { font-size: .875rem; color: var(--text-dim); line-height: 1.7; margin-bottom: 20px; }
+
+    .project-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .82rem; font-weight: 600; color: var(--purple-lt);
+      transition: color .2s, gap .2s;
+    }
+    .project-link:hover { color: #fff; gap: 10px; }
+    .project-link svg { width: 14px; height: 14px; }
+
+    /* Links */
+    #links { background: linear-gradient(180deg, var(--bg) 0%, #0d1428 100%); }
+
+    .links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+
+    .link-card {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+      transition: border-color .2s, transform .2s, background .2s;
+    }
+    .link-card:hover { border-color: rgba(124,58,237,.5); background: var(--purple-dim); transform: translateY(-2px); }
+
+    .link-icon {
+      flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px;
+      background: var(--purple-dim); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+
+    .link-info .link-name { font-family: var(--font-h); font-size: .92rem; font-weight: 600; color: #fff; margin-bottom: 2px; }
+    .link-info .link-handle { font-size: .78rem; color: var(--text-dim); }
+
+    /* Contact */
+    .contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+
+    .contact-info-list { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+
+    .contact-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 20px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 12px;
+    }
+    .contact-item-icon {
+      width: 40px; height: 40px; flex-shrink: 0;
+      border-radius: 10px; background: var(--purple-dim);
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .contact-item-text .ci-label { font-size: .75rem; color: var(--text-dim); margin-bottom: 2px; }
+    .contact-item-text .ci-value { font-size: .9rem; font-weight: 500; color: var(--text); }
+
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: .82rem; font-weight: 500; color: var(--text-dim); }
+
+    .form-group input,
+    .form-group textarea {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 16px;
+      font-family: var(--font-b); font-size: .9rem; color: var(--text);
+      outline: none; transition: border-color .2s; resize: vertical;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--purple-lt); }
+    .form-group textarea { min-height: 120px; }
+
+    .form-submit {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--purple); color: #fff;
+      font-family: var(--font-b); font-size: .9rem; font-weight: 600;
+      padding: 13px 32px; border-radius: 10px; border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 4px 20px rgba(124,58,237,.35);
+    }
+    .form-submit:hover { background: #6D28D9; transform: translateY(-2px); }
+    .form-note { font-size: .78rem; color: var(--text-dim); text-align: center; }
+
+    /* Footer */
+    footer {
+      background: #070B17; border-top: 1px solid var(--border); padding: 40px 0;
+    }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+    .footer-logo { font-family: var(--font-h); font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .footer-logo span { color: var(--purple-lt); }
+    .footer-copy { font-size: .82rem; color: var(--text-dim); }
+    .footer-links { display: flex; gap: 20px; list-style: none; }
+    .footer-links a { font-size: .82rem; color: var(--text-dim); }
+    .footer-links a:hover { color: var(--purple-lt); }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; }
+      .hero-avatar-wrap { display: none; }
+      .hero-desc { margin: 0 auto 40px; }
+      .hero-btns { justify-content: center; }
+      .hero-tag { justify-content: center; }
+      .about-grid { grid-template-columns: 1fr; }
+      .contact-inner { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    @media (max-width: 680px) {
+      section { padding: 64px 0; }
+      .nav-links { display: none; }
+      .nav-cta.desktop { display: none; }
+      .hamburger { display: flex; }
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .beam, .hero-tag::before { animation: none; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="container">
+      <div class="nav-inner">
+        <div class="nav-logo">Wang<span>.</span></div>
+        <ul class="nav-links">
+          <li><a href="#about">關於我</a></li>
+          <li><a href="#skills">技能</a></li>
+          <li><a href="#portfolio">作品集</a></li>
+          <li><a href="#links">連結</a></li>
+          <li><a href="#contact">聯絡</a></li>
+        </ul>
+        <a href="#contact" class="btn-ghost nav-cta desktop">聯絡我</a>
+        <button class="hamburger" id="hamburger" aria-label="選單">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#about" class="mob-link">關於我</a>
+      <a href="#skills" class="mob-link">技能</a>
+      <a href="#portfolio" class="mob-link">作品集</a>
+      <a href="#links" class="mob-link">連結</a>
+      <a href="#contact" class="mob-link">聯絡我</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="hero-bg">
+      <div class="beam"></div>
+      <div class="beam"></div>
+      <div class="beam"></div>
+      <div class="beam"></div>
+    </div>
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-text">
+          <div class="hero-tag">高雄科技大學 電子系碩士班</div>
+          <h1 class="hero-name">王唯任</h1>
+          <p class="hero-role">光學模擬研究者 · 伺服器工程師 · 多媒體創作者</p>
+          <p class="hero-desc">
+            熱愛科技與創新，使用 COMSOL Multiphysics 進行光波導模擬研究，
+            同時擅長 Linux 伺服器維運與多元多媒體創作。全力以赴，把每一件事做到最好。
+          </p>
+          <div class="hero-btns">
+            <a href="#portfolio" class="btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/></svg>
+              查看作品集
+            </a>
+            <a href="#contact" class="btn-ghost">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              聯絡我
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-avatar-wrap">
+          <div class="avatar-card">
+            <div class="avatar-img-wrap" id="avatar-wrap">
+              <img src="avatar.jpg" alt="個人頭像" id="avatar-img" ondragstart="return false;" />
+            </div>
+            <div class="avatar-badge">🔬 光纖通訊實驗室</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-eyebrow">關於我</p>
+        <h2 class="section-title">充滿熱情的工程師</h2>
+      </div>
+      <div class="about-grid reveal">
+        <div class="about-text">
+          <p>我是一個開朗且追求完美的人，身邊的人都認為我富有想法、邏輯明確、想像力豐富。目前就讀於高雄科技大學電子系碩士班，在光纖通訊實驗室由吳曜東教授指導，專注於使用 COMSOL Multiphysics 進行 EWFD 光學建模與模擬，目標研究光學運算元件。</p>
+          <p>除了學術研究，我也擅長 Linux 伺服器架設與維運、網路管理，以及多媒體製作——從影片剪輯到 3D 建模，都是我喜愛探索的領域。</p>
+          <p>熱愛邏輯思考與創造力的結合，喜歡將想法轉化為現實，無論是寫程式、建模還是多媒體創作，都能找到樂趣和成就感。</p>
+          <div class="about-stats">
+            <div class="stat-card">
+              <div class="num">99%+</div>
+              <div class="label">光學傳輸效率研究成果</div>
+            </div>
+            <div class="stat-card">
+              <div class="num">5+</div>
+              <div class="label">Linux 伺服器系統</div>
+            </div>
+            <div class="stat-card">
+              <div class="num">10+</div>
+              <div class="label">技術工具與環境</div>
+            </div>
+            <div class="stat-card">
+              <div class="num">碩士</div>
+              <div class="label">高科大電子系</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-period">2023 — 現在</div>
+            <div class="tl-title">高雄科技大學 電子系碩士班</div>
+            <div class="tl-desc">光纖通訊實驗室，COMSOL Multiphysics EWFD 光學建模模擬，研究光學運算元件，吳曜東教授指導。</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-period">2023</div>
+            <div class="tl-title">2023 光電與通訊工程應用研討會</div>
+            <div class="tl-desc">發表大學競賽研究成果，在無時間阻尼條件下設計並驗證高於 99% 傳輸效率的光學元件。</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-period">大學期間</div>
+            <div class="tl-title">大三專題競賽</div>
+            <div class="tl-desc">完成高效率光學傳輸元件設計與驗證，展現紮實的電磁模擬能力。</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-period">高中期間</div>
+            <div class="tl-title">競賽與自學歷程</div>
+            <div class="tl-desc">成功大學 X-Village Python 夏令營、APCS 3 級觀念 / 2 級實作、網路管理競賽、工科賽電腦修護第 23 名優勝。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-eyebrow">技術能力</p>
+        <h2 class="section-title">我的技能組合</h2>
+      </div>
+      <div class="skills-grid reveal">
+
+        <div class="skill-category">
+          <div class="skill-cat-icon">💻</div>
+          <div class="skill-cat-name">程式語言</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">C#</span>
+            <span class="skill-tag">C++</span>
+            <span class="skill-tag">C</span>
+            <span class="skill-tag">MATLAB</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="skill-cat-icon">🔬</div>
+          <div class="skill-cat-name">模擬與建模</div>
+          <div class="skill-tags">
+            <span class="skill-tag">COMSOL EWFD</span>
+            <span class="skill-tag">Ansys Lumerical</span>
+            <span class="skill-tag">FDTD</span>
+            <span class="skill-tag">光學建模</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="skill-cat-icon">🖥️</div>
+          <div class="skill-cat-name">伺服器 & 網路</div>
+          <div class="skill-tags">
+            <span class="skill-tag">AlmaLinux</span>
+            <span class="skill-tag">Debian / Ubuntu</span>
+            <span class="skill-tag">Proxmox VE</span>
+            <span class="skill-tag">TrueNAS</span>
+            <span class="skill-tag">HPC</span>
+            <span class="skill-tag">OPNsense</span>
+            <span class="skill-tag">WireGuard VPN</span>
+            <span class="skill-tag">Docker</span>
+            <span class="skill-tag">WordPress</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="skill-cat-icon">🤖</div>
+          <div class="skill-cat-name">AI 應用</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Claude AI</span>
+            <span class="skill-tag">Gemma 4</span>
+            <span class="skill-tag">Stable Diffusion</span>
+            <span class="skill-tag">深度學習應用</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="skill-cat-icon">🎬</div>
+          <div class="skill-cat-name">多媒體製作</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Premiere Pro</span>
+            <span class="skill-tag">Photoshop</span>
+            <span class="skill-tag">OBS</span>
+            <span class="skill-tag">ZBrush</span>
+            <span class="skill-tag">Blender</span>
+            <span class="skill-tag">Unity</span>
+          </div>
+        </div>
+
+        <div class="skill-category">
+          <div class="skill-cat-icon">📦</div>
+          <div class="skill-cat-name">版本控制 & 工具</div>
+          <div class="skill-tags">
+            <span class="skill-tag">GitHub</span>
+            <span class="skill-tag">Git</span>
+            <span class="skill-tag">Virtualmin</span>
+            <span class="skill-tag">Windows 維護</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Portfolio -->
+  <section id="portfolio">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-eyebrow">作品集</p>
+        <h2 class="section-title">代表性專案</h2>
+      </div>
+      <div class="portfolio-grid reveal">
+
+        <div class="project-card">
+          <div class="project-banner" id="banner-1">
+            <img src="project-01.png" alt="光波導研究" id="banner-img-1" />
+          </div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">COMSOL</span>
+              <span class="project-tag">光學模擬</span>
+              <span class="project-tag">研討會</span>
+            </div>
+            <h3 class="project-title">光波導傳輸效率研究</h3>
+            <p class="project-desc">使用 COMSOL Multiphysics EWFD 模組，在無時間阻尼條件下設計並驗證高於 99% 傳輸效率的光學運算元件，成果發表於 2023 光電與通訊工程應用研討會。</p>
+            <span class="project-link" style="cursor:default;">碩士論文研究 · 進行中</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-banner">
+            <div class="project-banner-ph">🖥️</div>
+          </div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">Linux</span>
+              <span class="project-tag">Proxmox</span>
+              <span class="project-tag">網路架設</span>
+            </div>
+            <h3 class="project-title">自建家庭伺服器環境</h3>
+            <p class="project-desc">以 Proxmox VE 虛擬化平台為核心，整合 TrueNAS 磁碟陣列、OPNsense 防火牆、WireGuard VPN 及 Docker 容器化應用，打造完整的自託管服務環境。</p>
+            <a href="https://github.com/Rainbow2408?tab=repositories" target="_blank" class="project-link">
+              查看 GitHub
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-banner">
+            <div class="project-banner-ph">🎮</div>
+          </div>
+          <div class="project-body">
+            <div class="project-tags">
+              <span class="project-tag">Unity</span>
+              <span class="project-tag">Blender</span>
+              <span class="project-tag">3D 建模</span>
+            </div>
+            <h3 class="project-title">3D 建模與遊戲開發</h3>
+            <p class="project-desc">結合 ZBrush、Blender 進行角色與場景 3D 建模，並以 Unity 引擎實作互動遊戲原型，探索從概念設計到實際部署的完整開發流程。</p>
+            <a href="https://github.com/Rainbow2408/work_code" target="_blank" class="project-link">
+              查看作品庫
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Links -->
+  <section id="links">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-eyebrow">常用連結</p>
+        <h2 class="section-title">找到我</h2>
+      </div>
+      <div class="links-grid reveal">
+
+        <a href="https://github.com/Rainbow2408" target="_blank" class="link-card">
+          <div class="link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#A78BFA"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.461-1.11-1.461-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.111-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.934.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.417 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          </div>
+          <div class="link-info">
+            <div class="link-name">GitHub 個人頁面</div>
+            <div class="link-handle">@Rainbow2408</div>
+          </div>
+        </a>
+
+        <a href="https://github.com/Rainbow2408/work_code" target="_blank" class="link-card">
+          <div class="link-icon">📁</div>
+          <div class="link-info">
+            <div class="link-name">作品儲存庫</div>
+            <div class="link-handle">work_code (私人)</div>
+          </div>
+        </a>
+
+        <a href="https://github.com/Rainbow2408?tab=repositories" target="_blank" class="link-card">
+          <div class="link-icon">🗂️</div>
+          <div class="link-info">
+            <div class="link-name">所有儲存庫</div>
+            <div class="link-handle">GitHub Repositories</div>
+          </div>
+        </a>
+
+        <a href="mailto:rainbow.w.2408@gmail.com" class="link-card">
+          <div class="link-icon">✉️</div>
+          <div class="link-info">
+            <div class="link-name">電子郵件</div>
+            <div class="link-handle">rainbow.w.2408@gmail.com</div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-eyebrow">聯絡方式</p>
+        <h2 class="section-title">歡迎與我聯繫</h2>
+      </div>
+      <div class="contact-inner reveal">
+        <div>
+          <p style="color:var(--text-dim); margin-bottom:28px; line-height:1.8;">無論是學術合作、技術諮詢或是單純想聊聊，都歡迎透過以下方式聯絡我。我通常會在 24 小時內回覆。</p>
+          <div class="contact-info-list">
+            <div class="contact-item">
+              <div class="contact-item-icon">🏫</div>
+              <div class="contact-item-text">
+                <div class="ci-label">所屬單位</div>
+                <div class="ci-value">高雄科技大學 電子系碩士班</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-item-icon">🔬</div>
+              <div class="contact-item-text">
+                <div class="ci-label">研究室</div>
+                <div class="ci-value">光纖通訊實驗室</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-item-icon">✉️</div>
+              <div class="contact-item-text">
+                <div class="ci-label">電子郵件</div>
+                <div class="ci-value">rainbow.w.2408@gmail.com</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-item-icon">💻</div>
+              <div class="contact-item-text">
+                <div class="ci-label">GitHub</div>
+                <div class="ci-value">github.com/Rainbow2408</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form">
+          <div class="form-group">
+            <label for="name">您的姓名</label>
+            <input type="text" id="cf-name" placeholder="ＯＯＯ" />
+          </div>
+          <div class="form-group">
+            <label for="email">電子郵件</label>
+            <input type="email" id="cf-email" placeholder="example@mail.com" />
+          </div>
+          <div class="form-group">
+            <label for="subject">主旨</label>
+            <input type="text" id="cf-subject" placeholder="學術合作 / 技術諮詢 / 其他..." />
+          </div>
+          <div class="form-group">
+            <label for="message">訊息內容</label>
+            <textarea id="cf-message" placeholder="請輸入您想說的話..."></textarea>
+          </div>
+          <button class="form-submit" onclick="handleSubmit(event)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            送出訊息
+          </button>
+          <p class="form-note" id="form-note"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">Wang<span>.</span></div>
+        <p class="footer-copy">© 2025 王唯任 · 高雄科技大學電子系碩士班</p>
+        <ul class="footer-links">
+          <li><a href="#hero">頂部</a></li>
+          <li><a href="#about">關於</a></li>
+          <li><a href="#portfolio">作品</a></li>
+          <li><a href="#contact">聯絡</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Avatar fallback
+    document.getElementById('avatar-img').addEventListener('error', function() {
+      document.getElementById('avatar-wrap').innerHTML =
+        '<div class="avatar-placeholder"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg><span>放置 avatar.jpg</span></div>';
+    });
+
+    // Banner fallback
+    document.getElementById('banner-img-1').addEventListener('error', function() {
+      document.getElementById('banner-1').innerHTML = '<div class="project-banner-ph">🔬</div>';
+    });
+
+    // Hamburger
+    const ham = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    ham.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+    document.querySelectorAll('.mob-link').forEach(link =>
+      link.addEventListener('click', () => mobileMenu.classList.remove('open'))
+    );
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Active nav
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+      });
+      navLinks.forEach(link => {
+        link.style.color = link.getAttribute('href') === '#' + current ? '#fff' : '';
+      });
+    }, { passive: true });
+
+    // Contact form
+    function handleSubmit(e) {
+      e.preventDefault();
+      const name    = document.getElementById('cf-name').value.trim();
+      const email   = document.getElementById('cf-email').value.trim();
+      const message = document.getElementById('cf-message').value.trim();
+      const note    = document.getElementById('form-note');
+
+      if (!name || !email || !message) {
+        note.style.color = '#F87171';
+        note.textContent = '請填寫姓名、電子郵件與訊息內容。';
+        return;
+      }
+
+      const subject = document.getElementById('cf-subject').value.trim() || '來自個人網站的訊息';
+      const body = '姓名：' + name + '\n電子郵件：' + email + '\n\n' + message;
+      window.location.href = 'mailto:rainbow.w.2408@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+
+      note.style.color = '#86EFAC';
+      note.textContent = '正在開啟您的郵件客戶端…';
+    }
+  </script>
+</body>
+</html>
