@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}個人作品集 | 高雄科技大學電子系碩士生{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="{{ url_for('home') }}" class="nav-logo">Wang<span>.</span></a>
+        <ul class="nav-links">
+          <li><a href="{{ url_for('home') }}#about">關於我</a></li>
+          <li><a href="{{ url_for('home') }}#skills">技能</a></li>
+          <li><a href="{{ url_for('home') }}#portfolio">作品集</a></li>
+          <li><a href="{{ url_for('ai_chat') }}">AI對話</a></li>
+          <li><a href="{{ url_for('ai_image') }}">AI繪圖</a></li>
+        </ul>
+        <a href="{{ url_for('home') }}#contact" class="btn-ghost nav-cta desktop">聯絡我</a>
+        <button class="hamburger" id="hamburger" aria-label="選單">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="{{ url_for('home') }}#about" class="mob-link">關於我</a>
+      <a href="{{ url_for('home') }}#skills" class="mob-link">技能</a>
+      <a href="{{ url_for('home') }}#portfolio" class="mob-link">作品集</a>
+      <a href="{{ url_for('ai_chat') }}" class="mob-link">AI對話</a>
+      <a href="{{ url_for('ai_image') }}" class="mob-link">AI繪圖</a>
+      <a href="{{ url_for('home') }}#contact" class="mob-link">聯絡我</a>
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">Wang<span>.</span></div>
+        <p class="footer-copy">© 2025 王唯任 · 高雄科技大學電子系碩士班</p>
+        <ul class="footer-links">
+          <li><a href="{{ url_for('home') }}#hero">頂部</a></li>
+          <li><a href="{{ url_for('home') }}#about">關於</a></li>
+          <li><a href="{{ url_for('home') }}#portfolio">作品</a></li>
+          <li><a href="{{ url_for('home') }}#contact">聯絡</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Hamburger
+    const ham = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    ham.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+    document.querySelectorAll('.mob-link').forEach(link =>
+      link.addEventListener('click', () => mobileMenu.classList.remove('open'))
+    );
+
+    // Active nav highlighting for homepage sections
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    if (sections.length > 0) {
+      window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(sec => {
+          if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+        });
+        navLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href.includes('#' + current) && current !== '') {
+            link.style.color = '#fff';
+          } else {
+            // Keep default styles for non-homepage nav links
+            if (!href.includes('ai-chat') && !href.includes('ai-image')) {
+              link.style.color = '';
+            }
+          }
+        });
+      }, { passive: true });
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

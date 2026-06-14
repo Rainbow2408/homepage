@@ -1,43 +1,6 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>個人作品集 | 高雄科技大學電子系碩士生</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-</head>
-<body>
+{% extends "base.html" %}
 
-  <!-- Navbar -->
-  <nav id="navbar">
-    <div class="container">
-      <div class="nav-inner">
-        <div class="nav-logo">Wang<span>.</span></div>
-        <ul class="nav-links">
-          <li><a href="#about">關於我</a></li>
-          <li><a href="#skills">技能</a></li>
-          <li><a href="#portfolio">作品集</a></li>
-          <li><a href="#links">連結</a></li>
-          <li><a href="#contact">聯絡</a></li>
-        </ul>
-        <a href="#contact" class="btn-ghost nav-cta desktop">聯絡我</a>
-        <button class="hamburger" id="hamburger" aria-label="選單">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-    <div class="mobile-menu" id="mobile-menu">
-      <a href="#about" class="mob-link">關於我</a>
-      <a href="#skills" class="mob-link">技能</a>
-      <a href="#portfolio" class="mob-link">作品集</a>
-      <a href="#links" class="mob-link">連結</a>
-      <a href="#contact" class="mob-link">聯絡我</a>
-    </div>
-  </nav>
-
+{% block content %}
   <!-- Hero -->
   <section id="hero">
     <div class="hero-bg">
@@ -91,7 +54,7 @@
         <div class="about-text">
           <p>我是一個開朗且追求完美的人，身邊的人都認為我富有想法、邏輯明確、想像力豐富。目前就讀於高雄科技大學電子系碩士班，在光纖通訊實驗室由吳曜東教授指導，專注於使用 COMSOL Multiphysics 進行 EWFD 光學建模與模擬，目標研究光學運算元件。</p>
           <p>除了學術研究，我也擅長 Linux 伺服器架設與維運、網路管理，以及多媒體製作——從影片剪輯到 3D 建模，都是我喜愛探索的領域。</p>
-          <p>熱愛邏輯思考與創造力的結合，喜歡將想法轉化為現實，無論是寫程式、建模還是多媒體創作，都能找到樂趣 and 成就感。</p>
+          <p>熱愛邏輯思考與創造力的結合，喜歡將想法轉化為現實，無論是寫程式、建模還是多媒體創作，都能找到樂趣和成就感。</p>
           <div class="about-stats">
             <div class="stat-card">
               <div class="num">99%+</div>
@@ -407,23 +370,9 @@
       </div>
     </div>
   </section>
+{% endblock %}
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-logo">Wang<span>.</span></div>
-        <p class="footer-copy">© 2025 王唯任 · 高雄科技大學電子系碩士班</p>
-        <ul class="footer-links">
-          <li><a href="#hero">頂部</a></li>
-          <li><a href="#about">關於</a></li>
-          <li><a href="#portfolio">作品</a></li>
-          <li><a href="#contact">聯絡</a></li>
-        </ul>
-      </div>
-    </div>
-  </footer>
-
+{% block scripts %}
   <script>
     // Avatar fallback
     document.getElementById('avatar-img').addEventListener('error', function() {
@@ -436,14 +385,6 @@
       document.getElementById('banner-1').innerHTML = '<div class="project-banner-ph">🔬</div>';
     });
 
-    // Hamburger
-    const ham = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobile-menu');
-    ham.addEventListener('click', () => mobileMenu.classList.toggle('open'));
-    document.querySelectorAll('.mob-link').forEach(link =>
-      link.addEventListener('click', () => mobileMenu.classList.remove('open'))
-    );
-
     // Scroll reveal
     const reveals = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver((entries) => {
@@ -455,19 +396,6 @@
       });
     }, { threshold: 0.12 });
     reveals.forEach(el => observer.observe(el));
-
-    // Active nav
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-links a');
-    window.addEventListener('scroll', () => {
-      let current = '';
-      sections.forEach(sec => {
-        if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
-      });
-      navLinks.forEach(link => {
-        link.style.color = link.getAttribute('href') === '#' + current ? '#fff' : '';
-      });
-    }, { passive: true });
 
     // Contact form
     function handleSubmit(e) {
@@ -491,5 +419,4 @@
       note.textContent = '正在開啟您的郵件客戶端…';
     }
   </script>
-</body>
-</html>
+{% endblock %}
