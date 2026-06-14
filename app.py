@@ -55,7 +55,9 @@ def ai_image():
         # Standard sizes supported by DALL-E models
         # DALL-E 3 supports 1024x1024, 1024x1792, 1792x1024
         # DALL-E 2 supports 512x512, 256x256, 1024x1024
-        model = "dall-e-3"
+        # Read preferred image model from env (defaults to dall-e-3)
+        pref_model = os.getenv("OPENAI_IMAGE_MODEL", "dall-e-3")
+        model = pref_model
         if size in ["256x256", "512x512"]:
             model = "dall-e-2"
             
@@ -69,6 +71,30 @@ def ai_image():
             image_url = response.data[0].url
             return jsonify(success=True, url=image_url)
         except Exception as e:
+            err_str = str(e)
+            # Check if DALL-E 3 fails because it is not supported or does not exist
+            if model == "dall-e-3" and ("dall-e-3" in err_str or "does not exist" in err_str.lower() or "400" in err_str):
+                # Fallback to DALL-E 2 with a supported square size
+                fallback_size = size if size in ["1024x1024", "512x512", "256x256"] else "1024x1024"
+                try:
+                    response = client.images.generate(
+                        model="dall-e-2",
+                        prompt=prompt,
+                        size=fallback_size,
+                        n=1
+                    )
+                    image_url = response.data[0].url
+                    return jsonify(
+                        success=True, 
+                        url=image_url, 
+                        warning="系統偵測到您的 API 金鑰不支援 DALL-E 3，已自動為您降級至 DALL-E 2 生成圖片！"
+                    )
+                except Exception as e_inner:
+                    return jsonify(
+                        success=False, 
+                        error=f"DALL-E 3 無法使用且自動降級至 DALL-E 2 失敗。錯誤訊息: {str(e_inner)}"
+                    ), 500
+            
             return jsonify(success=False, error=str(e)), 500
             
     return render_template('ai_image.html')
