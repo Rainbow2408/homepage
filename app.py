@@ -10,16 +10,25 @@ from openai import OpenAI
 
 app = Flask(__name__)
 
-# Initialize OpenAI client with API Key
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize OpenAI client safely (lazy loaded)
+client = None
+def get_openai_client():
+    global client
+    if client is None:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise Exception("未設定 OPENAI_API_KEY。請確認已在 Render 後台的 Environment Variables 中設定您的 OpenAI API 金鑰。")
+        client = OpenAI(api_key=api_key)
+    return client
 
-# User-requested custom text generation function
+# User-requested text generation function, updated to use official OpenAI SDK
 def ask_ai(prompt):
-    response = client.responses.create(
-        model="gpt-4.1-mini",
-        input=prompt
+    openai_client = get_openai_client()
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
     )
-    return response.output_text
+    return response.choices[0].message.content
 
 @app.route('/')
 def home():
@@ -43,7 +52,8 @@ def ai_chat():
     return render_template('ai_chat.html')
 
 # Helper function to generate images with fallback models (handles deprecation of dall-e series)
-def generate_image_with_fallback(client, prompt, size):
+def generate_image_with_fallback(prompt, size):
+    openai_client = get_openai_client()
     is_low_res = size in ["256x256", "512x512"]
     pref_model = os.getenv("OPENAI_IMAGE_MODEL")
     
@@ -71,7 +81,7 @@ def generate_image_with_fallback(client, prompt, size):
                 active_size = "1024x1024"
                 
         try:
-            response = client.images.generate(
+            response = openai_client.images.generate(
                 model=model,
                 prompt=prompt,
                 size=active_size,
@@ -94,7 +104,7 @@ def ai_image():
             return jsonify(success=False, error="圖片文字描述不能為空"), 400
             
         try:
-            image_url, active_model, size_changed = generate_image_with_fallback(client, prompt, size)
+            image_url, active_model, size_changed = generate_image_with_fallback(prompt, size)
             
             # Formulate user warning if fallback occurred
             warning_msg = None
