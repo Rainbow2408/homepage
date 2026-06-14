@@ -42,6 +42,47 @@ def ai_chat():
             
     return render_template('ai_chat.html')
 
+# Helper function to generate images with fallback models (handles deprecation of dall-e series)
+def generate_image_with_fallback(client, prompt, size):
+    is_low_res = size in ["256x256", "512x512"]
+    pref_model = os.getenv("OPENAI_IMAGE_MODEL")
+    
+    if is_low_res:
+        # Prioritize 1.5, then 2, then legacy dall-e-2
+        model_sequence = ["gpt-image-1.5", "gpt-image-2", "dall-e-2"]
+        if pref_model:
+            if pref_model in model_sequence:
+                model_sequence.remove(pref_model)
+            model_sequence.insert(0, pref_model)
+    else:
+        # Prioritize 2, then 1.5, then legacy dall-e-3 and dall-e-2
+        model_sequence = ["gpt-image-2", "gpt-image-1.5", "dall-e-3", "dall-e-2"]
+        if pref_model:
+            if pref_model in model_sequence:
+                model_sequence.remove(pref_model)
+            model_sequence.insert(0, pref_model)
+
+    errors = []
+    for model in model_sequence:
+        active_size = size
+        # gpt-image-1.5 and dall-e-2 only support square dimensions
+        if model in ["gpt-image-1.5", "dall-e-2"]:
+            if active_size not in ["1024x1024", "512x512", "256x256"]:
+                active_size = "1024x1024"
+                
+        try:
+            response = client.images.generate(
+                model=model,
+                prompt=prompt,
+                size=active_size,
+                n=1
+            )
+            return response.data[0].url, model, (active_size != size)
+        except Exception as e:
+            errors.append(f"{model}: {str(e)}")
+            
+    raise Exception(" | ".join(errors))
+
 @app.route('/ai-image', methods=['GET', 'POST'])
 def ai_image():
     if request.method == 'POST':
@@ -52,49 +93,18 @@ def ai_image():
         if not prompt:
             return jsonify(success=False, error="圖片文字描述不能為空"), 400
             
-        # Standard sizes supported by DALL-E models
-        # DALL-E 3 supports 1024x1024, 1024x1792, 1792x1024
-        # DALL-E 2 supports 512x512, 256x256, 1024x1024
-        # Read preferred image model from env (defaults to dall-e-3)
-        pref_model = os.getenv("OPENAI_IMAGE_MODEL", "dall-e-3")
-        model = pref_model
-        if size in ["256x256", "512x512"]:
-            model = "dall-e-2"
-            
         try:
-            response = client.images.generate(
-                model=model,
-                prompt=prompt,
-                size=size,
-                n=1
-            )
-            image_url = response.data[0].url
-            return jsonify(success=True, url=image_url)
-        except Exception as e:
-            err_str = str(e)
-            # Check if DALL-E 3 fails because it is not supported or does not exist
-            if model == "dall-e-3" and ("dall-e-3" in err_str or "does not exist" in err_str.lower() or "400" in err_str):
-                # Fallback to DALL-E 2 with a supported square size
-                fallback_size = size if size in ["1024x1024", "512x512", "256x256"] else "1024x1024"
-                try:
-                    response = client.images.generate(
-                        model="dall-e-2",
-                        prompt=prompt,
-                        size=fallback_size,
-                        n=1
-                    )
-                    image_url = response.data[0].url
-                    return jsonify(
-                        success=True, 
-                        url=image_url, 
-                        warning="系統偵測到您的 API 金鑰不支援 DALL-E 3，已自動為您降級至 DALL-E 2 生成圖片！"
-                    )
-                except Exception as e_inner:
-                    return jsonify(
-                        success=False, 
-                        error=f"DALL-E 3 無法使用且自動降級至 DALL-E 2 失敗。錯誤訊息: {str(e_inner)}"
-                    ), 500
+            image_url, active_model, size_changed = generate_image_with_fallback(client, prompt, size)
             
+            # Formulate user warning if fallback occurred
+            warning_msg = None
+            if active_model != os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-2") and active_model != "gpt-image-2":
+                warning_msg = f"系統偵測到您的 API 金鑰不支援預設模型，已自動為您降級至 {active_model} 生成圖片！"
+                if size_changed:
+                    warning_msg += " (因模型限制，已將尺寸調整為 1024x1024 正方形)"
+            
+            return jsonify(success=True, url=image_url, warning=warning_msg)
+        except Exception as e:
             return jsonify(success=False, error=str(e)), 500
             
     return render_template('ai_image.html')
