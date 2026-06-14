@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, request, jsonify
+from werkzeug.exceptions import HTTPException
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -9,17 +10,22 @@ load_dotenv()
 from openai import OpenAI
 
 app = Flask(__name__)
+# Ensure unhandled exceptions are caught by our errorhandlers, not propagated to WSGI server
+app.config["PROPAGATE_EXCEPTIONS"] = False
 
 # Global error handlers — ensure API routes always return JSON, never HTML
+@app.errorhandler(HTTPException)
+def handle_http_exception(e):
+    """Handle werkzeug HTTP errors (4xx/5xx) and return JSON."""
+    return jsonify(success=False, error=f"HTTP {e.code}: {e.description}"), e.code
+
 @app.errorhandler(Exception)
 def handle_exception(e):
-    """Return JSON for any unhandled exception so the frontend can parse it."""
-    import traceback
+    """Return JSON for any unhandled non-HTTP exception."""
+    # Re-raise HTTPExceptions so handle_http_exception takes over
+    if isinstance(e, HTTPException):
+        return handle_http_exception(e)
     return jsonify(success=False, error=f"伺服器內部錯誤：{str(e)}"), 500
-
-@app.errorhandler(404)
-def handle_404(e):
-    return jsonify(success=False, error="找不到指定的 API 路由"), 404
 
 # Initialize OpenAI client safely (lazy loaded)
 client = None
@@ -69,15 +75,13 @@ def generate_image_with_fallback(prompt, size):
     pref_model = os.getenv("OPENAI_IMAGE_MODEL")
     
     if is_low_res:
-        # Prioritize 1.5, then 2, then legacy dall-e-2
-        model_sequence = ["gpt-image-1.5", "gpt-image-2", "dall-e-2"]
-        if pref_model:
-            if pref_model in model_sequence:
-                model_sequence.remove(pref_model)
+        # For low-res, dall-e-2 is the only model that supports 256x256/512x512
+        model_sequence = ["dall-e-2"]
+        if pref_model and pref_model not in model_sequence:
             model_sequence.insert(0, pref_model)
     else:
-        # Prioritize 2, then 1.5, then legacy dall-e-3 and dall-e-2
-        model_sequence = ["gpt-image-2", "gpt-image-1.5", "dall-e-3", "dall-e-2"]
+        # For standard/high-res, try gpt-image-1 first (latest), then dall-e-3, then dall-e-2
+        model_sequence = ["gpt-image-1", "dall-e-3", "dall-e-2"]
         if pref_model:
             if pref_model in model_sequence:
                 model_sequence.remove(pref_model)
@@ -86,8 +90,8 @@ def generate_image_with_fallback(prompt, size):
     errors = []
     for model in model_sequence:
         active_size = size
-        # gpt-image-1.5 and dall-e-2 only support square dimensions
-        if model in ["gpt-image-1.5", "dall-e-2"]:
+        # dall-e-2 only supports square dimensions
+        if model == "dall-e-2":
             if active_size not in ["1024x1024", "512x512", "256x256"]:
                 active_size = "1024x1024"
                 
@@ -117,9 +121,10 @@ def ai_image():
         try:
             image_url, active_model, size_changed = generate_image_with_fallback(prompt, size)
             
-            # Formulate user warning if fallback occurred
+            # Formulate user warning if fallback occurred (primary model is gpt-image-1)
             warning_msg = None
-            if active_model != os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-2") and active_model != "gpt-image-2":
+            primary_model = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
+            if active_model != primary_model:
                 warning_msg = f"系統偵測到您的 API 金鑰不支援預設模型，已自動為您降級至 {active_model} 生成圖片！"
                 if size_changed:
                     warning_msg += " (因模型限制，已將尺寸調整為 1024x1024 正方形)"
