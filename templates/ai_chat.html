@@ -104,6 +104,14 @@
         body: JSON.stringify({ prompt: promptText })
       });
 
+      // Check Content-Type before parsing JSON to avoid confusing parse errors
+      const contentType = response.headers.get('Content-Type') || '';
+      if (!contentType.includes('application/json')) {
+        chatLoading.style.display = 'none';
+        appendMessage('ai', `伺服器回傳非預期的格式（HTTP ${response.status}），請稍後再試。`);
+        return;
+      }
+
       const data = await response.json();
       chatLoading.style.display = 'none';
 
@@ -114,7 +122,7 @@
       }
     } catch (err) {
       chatLoading.style.display = 'none';
-      appendMessage('ai', `系統異常: ${err.message}`);
+      appendMessage('ai', `網路連線失敗，請檢查互聯網連線後再試。`);
     } finally {
       // Re-enable UI
       userPrompt.disabled = false;

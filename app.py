@@ -10,6 +10,17 @@ from openai import OpenAI
 
 app = Flask(__name__)
 
+# Global error handlers — ensure API routes always return JSON, never HTML
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Return JSON for any unhandled exception so the frontend can parse it."""
+    import traceback
+    return jsonify(success=False, error=f"伺服器內部錯誤：{str(e)}"), 500
+
+@app.errorhandler(404)
+def handle_404(e):
+    return jsonify(success=False, error="找不到指定的 API 路由"), 404
+
 # Initialize OpenAI client safely (lazy loaded)
 client = None
 def get_openai_client():

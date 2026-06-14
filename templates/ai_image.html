@@ -112,6 +112,15 @@
         body: JSON.stringify({ prompt: prompt, size: size })
       });
 
+      // Check Content-Type before parsing JSON
+      const contentType = response.headers.get('Content-Type') || '';
+      if (!contentType.includes('application/json')) {
+        imageLoading.style.display = 'none';
+        alert(`伺服器回傳非預期的格式（HTTP ${response.status}），請稍後再試。`);
+        resetGenerator();
+        return;
+      }
+
       const data = await response.json();
       imageLoading.style.display = 'none';
 
@@ -134,7 +143,7 @@
       }
     } catch (err) {
       imageLoading.style.display = 'none';
-      alert(`系統異常: ${err.message}`);
+      alert(`網路連線失敗，請檢查互聯網連線後再試。`);
       resetGenerator();
     }
   }
