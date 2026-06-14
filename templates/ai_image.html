@@ -126,8 +126,7 @@
 
       if (response.ok && data.success) {
         resultImage.src = data.url;
-        downloadLink.href = data.url;
-        
+
         const warningNotice = document.getElementById('warning-notice');
         if (data.warning) {
           warningNotice.textContent = data.warning;
@@ -135,7 +134,21 @@
         } else {
           warningNotice.style.display = 'none';
         }
-        
+
+        // gpt-image-1 returns base64 data URL — set up direct download.
+        // dall-e models return a remote URL — open in new tab as before.
+        if (data.is_data_url) {
+          downloadLink.href = data.url;
+          downloadLink.setAttribute('download', 'ai-generated-image.png');
+          downloadLink.removeAttribute('target');
+          downloadLink.textContent = '⬇ 下載圖片 (PNG)';
+        } else {
+          downloadLink.href = data.url;
+          downloadLink.setAttribute('target', '_blank');
+          downloadLink.removeAttribute('download');
+          downloadLink.textContent = '在新分頁開啟原圖';
+        }
+
         imageResult.style.display = 'flex';
       } else {
         alert(`錯誤: ${data.error || '生成失敗。'}`);

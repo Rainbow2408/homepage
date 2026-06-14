@@ -96,13 +96,28 @@ def generate_image_with_fallback(prompt, size):
                 active_size = "1024x1024"
                 
         try:
-            response = openai_client.images.generate(
-                model=model,
-                prompt=prompt,
-                size=active_size,
-                n=1
-            )
-            return response.data[0].url, model, (active_size != size)
+            # gpt-image-1 ONLY returns b64_json (no URL support).
+            # dall-e-2 and dall-e-3 support response_format="url".
+            if model == "gpt-image-1":
+                import base64
+                response = openai_client.images.generate(
+                    model=model,
+                    prompt=prompt,
+                    size=active_size,
+                    n=1,
+                )
+                b64 = response.data[0].b64_json
+                image_url = f"data:image/png;base64,{b64}"
+                return image_url, model, (active_size != size), True   # is_data_url=True
+            else:
+                response = openai_client.images.generate(
+                    model=model,
+                    prompt=prompt,
+                    size=active_size,
+                    n=1,
+                    response_format="url",
+                )
+                return response.data[0].url, model, (active_size != size), False  # is_data_url=False
         except Exception as e:
             errors.append(f"{model}: {str(e)}")
             
@@ -119,7 +134,7 @@ def ai_image():
             return jsonify(success=False, error="圖片文字描述不能為空"), 400
             
         try:
-            image_url, active_model, size_changed = generate_image_with_fallback(prompt, size)
+            image_url, active_model, size_changed, is_data_url = generate_image_with_fallback(prompt, size)
             
             # Formulate user warning if fallback occurred (primary model is gpt-image-1)
             warning_msg = None
@@ -129,7 +144,7 @@ def ai_image():
                 if size_changed:
                     warning_msg += " (因模型限制，已將尺寸調整為 1024x1024 正方形)"
             
-            return jsonify(success=True, url=image_url, warning=warning_msg)
+            return jsonify(success=True, url=image_url, warning=warning_msg, is_data_url=is_data_url)
         except Exception as e:
             return jsonify(success=False, error=str(e)), 500
             
